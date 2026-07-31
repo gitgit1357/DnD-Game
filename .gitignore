@@ -1,0 +1,71 @@
+﻿# Windows
+Thumbs.db
+Thumbs.db:encryptable
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.code-workspace
+*.swp
+*.swo
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.autosave
+~$*
+
+# Logs
+*.log
+logs/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Node artifacts
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test and coverage output
+coverage/
+.coverage
+htmlcov/
+test-results/
+
+# Generated release archives
+*.zip
+*.7z
+*.rar
+
+# Local development files
+.env
+.env.*
+!.env.example
+
+# Local save data
+saves/
+save-data/
+local-saves/
