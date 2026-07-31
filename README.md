@@ -1,17 +1,13 @@
-# Roadwarden: Solo Realm v0.66.0
+# Roadwarden: Solo Realm v0.67.0
 
 Canonical playable single-file release: `index.html`.
 
-## v0.66.0 highlights
-- Institutions now carry long-term agendas and political momentum across years.
-- Influence rises or falls through victories, satisfaction, faction backing, scandals, and accumulated agenda success.
-- Dominant blocs can create persistent regional leadership eras that bias future policy without fully controlling it.
-- Severe opposition to a dominant bloc can surface as scandal World Facts with lasting political consequences.
-- Institutional budget priorities are now contested among councils, guilds, military bodies, faith institutions, scholarly groups, and trade interests.
-- Each institution has persistent satisfaction/influence memory and a preferred budget priority.
-- Close or divided annual budget votes can create persistent institutional-politics World Facts and mediation contracts.
-- Maintenance spending now follows political priority under scarcity, allowing neglected assets to deteriorate even when other programs are protected.
-- Capital investment recommendations can follow the adopted annual priority when no emergency project dominates.
-- v0.64 Field Magic and all prior strict-clock, seasonal, ripple, Chronicle, reputation, and living-world systems remain intact.
+## v0.67.0 highlights
+- Begins the Adventure Loop Integration and UX phase; no new deep simulation subsystem.
+- Adds a dedicated top-level Magic tab for Field Magic.
+- Adds a settlement Suggested Next Step based on focused quests, contract offers, provisions, and party wounds.
+- Replaces the settlement wall of buttons with four contextual action groups: Immediate, Explore, Services, and Character.
+- Preserves every existing settlement action while reducing simultaneous visual clutter.
+- Adds `ADVENTURE_UX_AUDIT.md` and keeps the tabbed visual overhaul as the next major presentation track.
 
-See `POLITICAL_AGENDA_MODEL.md`, `INSTITUTIONAL_POLITICS_MODEL.md`, and `INSTITUTIONAL_BUDGET_MODEL.md`.
+All v0.66 political, seasonal, Chronicle, World-Fact, strict-clock, and Field Magic systems remain intact.

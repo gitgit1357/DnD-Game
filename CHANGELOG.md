@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.67.0
+### Adventure loop integration & first UX cleanup
+- Froze major background-simulation expansion for this milestone.
+- Added Magic as a top-level campaign navigation tab.
+- Added contextual Suggested Next Step guidance in settlements.
+- Grouped town actions into Immediate, Explore, Services, and Character panels.
+- Preserved all existing town actions while reducing simultaneous button density.
+- Added responsive two-column action tabs on narrow screens.
+- Added `ADVENTURE_UX_AUDIT.md` to define remaining browser/playtest work and complexity limits.
+
 ## v0.66.0
 ### Political agendas, influence & leadership drift
 - Added persistent institution agendas with momentum across budget years.

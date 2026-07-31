@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Roadwarden: Solo Realm v0.66.0</title>
+<title>Roadwarden: Solo Realm v0.67.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
@@ -170,6 +170,13 @@ hr{border:0;border-top:1px solid var(--line);margin:13px 0}
 .campaign-nav{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0 13px;padding:9px;background:#160f0a;border:1px solid var(--line);border-radius:5px}
 .campaign-nav button{flex:1 1 105px}
 .campaign-nav .active-tab{outline:2px solid var(--accent)}
+.town-action-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:12px 0}
+.town-action-tabs button{min-height:42px}
+.town-action-tabs .active-tab{outline:2px solid var(--accent);background:linear-gradient(180deg,#5c4420,#3a2810)}
+.town-action-panel{border:1px solid var(--line);background:#120d08;padding:12px;border-radius:4px;margin-bottom:12px}
+.next-action{border-left:3px solid var(--good);background:linear-gradient(160deg,#1c2517,#15170f)}
+.context-note{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}.context-note .badge{margin:0}
+@media(max-width:650px){.town-action-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .file-drop{border:1px dashed var(--line);border-radius:5px;padding:13px;margin:11px 0;background:#1a130d}
 </style>
 </head>
@@ -1625,11 +1632,11 @@ const RESILIENCE_INVESTMENT_TYPES={
   patrol_posts:{name:"Patrol posts & road watch",days:50,costPressure:3,law:12,order:5,bandit:-8,audiences:{martial:.9,trade:.7,authority:.8},institutionKinds:["civic","martial"]}
 };
 
-// v0.66.0: Institutional budgets, maintenance, and political priority tradeoffs.
+// v0.67.0: Institutional budgets, maintenance, and political priority tradeoffs.
 // Completed resilience works are durable assets, not permanent free bonuses.
 const INSTITUTIONAL_PRIORITY_LABELS={resilience:"Resilience",commerce:"Commerce",security:"Security",welfare:"Welfare"};
 
-// v0.66.0: Institutional politics and contested budgets.
+// v0.67.0: Institutional politics and contested budgets.
 // Institutions have interests, preferences, satisfaction, and political memory; budgets are negotiated rather than omniscient.
 const INSTITUTION_PRIORITY_BIASES={
   civic:{resilience:1,commerce:1,security:1,welfare:1},
@@ -1644,7 +1651,7 @@ const INSTITUTION_PRIORITY_BIASES={
 function ensureInstitutionalPoliticsState(regionId){
   const env=regionalEnvironment(regionId),d=settlementDossierByRegion(regionId);env.institutionalPolitics=env.institutionalPolitics||{satisfaction:{},influence:{},agendas:{},history:[],lastContest:null,leadership:{style:"balanced",dominantInstitutionId:null,sinceYear:campaignYear()}};const p=env.institutionalPolitics;p.history=p.history||[];p.satisfaction=p.satisfaction||{};p.influence=p.influence||{};p.agendas=p.agendas||{};p.leadership=p.leadership||{style:"balanced",dominantInstitutionId:null,sinceYear:campaignYear()};(d?.institutions||[]).forEach(i=>{if(p.satisfaction[i.id]===undefined)p.satisfaction[i.id]=0;if(p.influence[i.id]===undefined)p.influence[i.id]=1;if(!p.agendas[i.id])p.agendas[i.id]={priority:institutionBudgetPreference?institutionBudgetPreference(regionId,i):"commerce",momentum:0,lastAdvancedYear:0,backers:[]}});return p;
 }
-// v0.66.0: long-term political agendas, influence drift, faction backing, and leadership philosophy.
+// v0.67.0: long-term political agendas, influence drift, faction backing, and leadership philosophy.
 function institutionFactionBacking(regionId,institution){
   ensureFactionState();const txt=(String(institution?.name||"")+" "+String(institution?.interest||"")).toLowerCase();let backing=0,backers=[];
   for(const f of activeFactionsInRegion(regionId)){const a=FACTION_ARCHETYPES[f.archetypeId]||{},label=(String(a.label||"")+" "+String(f.name||"")).toLowerCase();let fit=0;if(/merchant|trade|guild|caravan/.test(txt)&&/outlaw|mercenary|trade|merchant/.test(label))fit=.25;if(/guard|military|watch|patrol|thane|command/.test(txt)&&/mercenary|outlaw/.test(label))fit=.15;if(/faith|shrine|temple|warden/.test(txt)&&/cult/.test(label))fit=-.25;if(fit){backing+=fit*Math.max(.5,(f.strength||3)/3);backers.push(f.id)}}
@@ -2640,7 +2647,7 @@ let state = freshState();
 
 function freshState(){
   return {
-    version:"0.66.0", phase:"create", day:1, hour:8, minute:0, location:"Crossroads",
+    version:"0.67.0", phase:"create", day:1, hour:8, minute:0, location:"Crossroads",
     hero:null, companions:[], candidates:[], inventory:{"Rations":2,"Bandage":1}, itemCondition:{}, itemMagic:{},
     gold:35, silver:0, reputation:0, karma:0, suspicion:0, luck:0,
     provisions:{lastFoodDay:1,hungerDays:0},
@@ -3852,7 +3859,7 @@ function showCampaignDashboard(){renderCampaignNav();
     <div class="actions"><button onclick="showQuestJournal()">Quests</button><button onclick="showWorldMap()">World</button><button onclick="showPartyManagement()">Party</button><button onclick="showBalanceDiagnostics()">Balance Snapshot</button><button onclick="render()">Adventure</button></div>`;
 }
 function currentNavTab(){
-  if(["combat","loot","travel","questTravel","dungeon","questEnd","cityTravel","town"].includes(state.phase))return "adventure";
+  if(["combat","loot","travel","questTravel","dungeon","questEnd","cityTravel"].includes(state.phase))return "adventure";
   return state.flags?.uiTab||"adventure";
 }
 function showInventoryHub(){renderCampaignNav();
@@ -3870,16 +3877,18 @@ function navigateCampaignTab(tab){
   if(tab==="quests"){showQuestJournal();return}
   if(tab==="inventory"){showInventoryHub();return}
   if(tab==="world"){showWorldMap();return}
+  if(tab==="magic"){showFieldMagic();return}
   if(tab==="character"){showCharacterHub();return}
 }
 function renderCampaignNav(){
   const el=document.getElementById("campaignNav");if(!el)return;
   if(!state.hero){el.innerHTML="";return}
   const tab=currentNavTab();
-  const items=[["adventure","Adventure"],["party","Party"],["quests","Quests"],["inventory","Inventory"],["world","World"],["character","Character"]];
+  const items=[["adventure","Adventure"],["party","Party"],["quests","Quests"],["inventory","Inventory"],["world","World"],["magic","Magic"],["character","Character"]];
   el.innerHTML=`<div class="campaign-nav">${items.map(([id,label])=>`<button class="${tab===id?"active-tab":""}" onclick="navigateCampaignTab('${id}')">${label}</button>`).join("")}</div>`;
 }
 function render(){
+  state.flags=state.flags||{};state.flags.uiTab="adventure";
   renderHud(); renderCampaignNav(); renderCharacter(); renderLog();
   const map={create:renderCreate,recruit:renderRecruit,town:renderTown,travel:renderTravel,questTravel:renderQuestTravel,dungeon:renderDungeon,combat:renderCombat,loot:renderLoot,questEnd:renderQuestEnd,cityTravel:renderCityTravel};
   (map[state.phase]||renderTown)();
@@ -4803,6 +4812,36 @@ function showRegionReputation(id){
     ${active.map(q=>`<div class="small">• ${escapeHtml(cap(q.task))} — ${escapeHtml(regionDef(q.originRegion).name)} → ${escapeHtml(regionDef(q.targetRegion).name)}</div>`).join("")}
     <div class="actions"><button class="primary" onclick="closeModal()">Close</button></div>`);
 }
+function currentTownActionGroup(){
+  state.flags=state.flags||{};
+  return state.flags.townActionGroup||"immediate";
+}
+function setTownActionGroup(group){
+  state.flags=state.flags||{};state.flags.townActionGroup=group;renderTown();
+}
+function townActionTabs(){
+  const current=currentTownActionGroup();
+  const tabs=[["immediate","Immediate"],["explore","Explore"],["services","Services"],["character","Character"]];
+  return `<div class="town-action-tabs">${tabs.map(([id,label])=>`<button class="${current===id?"active-tab":""}" onclick="setTownActionGroup('${id}')">${label}</button>`).join("")}</div>`;
+}
+function townRecommendedAction(){
+  const q=state.quest&&questById(state.quest.id);
+  if(q){
+    if(q.status==="ready")return {label:`Return to ${questOriginTown(q)}`,detail:"Your focused quest is ready to turn in.",action:`beginQuestReturn(questById('${q.id}'))`};
+    return {label:"Pursue Focused Quest",detail:`Continue: ${cap(q.task)}.`,action:"depart()"};
+  }
+  if(state.questOffer)return {label:"Review Current Contract",detail:`${cap(state.questOffer.patron)} has a contract waiting.`,action:"setTownActionGroup('immediate')"};
+  if(provisionDaysRemaining()<2)return {label:"Buy Provisions",detail:"Your remaining food is becoming a travel risk.",action:"showShop('buy')"};
+  if(state.companions.some(c=>c.hp<c.maxHp)||state.hero.hp<state.hero.maxHp)return {label:"Treat the Party",detail:"Someone in the party is wounded.",action:"showFieldMagic()"};
+  return {label:"Find a New Quest",detail:"No focused objective currently demands your attention.",action:"findNewQuest()"};
+}
+function renderTownActionPanel(noticedCount,quests){
+  const g=currentTownActionGroup();
+  if(g==="immediate")return `<div class="town-action-panel"><h3>Immediate Actions</h3><div class="actions"><button class="primary" onclick="showTravelDestinations()">Travel</button><button onclick="showQuestJournal()">Quest Journal (${quests.length}/4)</button><button onclick="showFieldMagic()">Field Magic</button><button onclick="showInn()">Rest at Inn</button><button onclick="showShop()">Buy Supplies</button>${state.quest&&questById(state.quest.id)?`<button class="good" onclick="depart()">Pursue Focused Quest</button>`:""}</div></div>`;
+  if(g==="explore")return `<div class="town-action-panel"><h3>Explore & Investigate</h3><div class="actions"><button onclick="showWorldMap()">World Map</button>${atlasDef(state.town.regionId)?`<button onclick="showRegionalAtlas('${state.town.regionId}')">Regional Atlas</button>`:""}${state.town.dossierId?`<button onclick="showSettlementDossier('${state.town.dossierId}')">Settlement Dossier</button>`:""}<button onclick="showTownNPCs()">People</button><button class="${noticedCount?"good":""}" onclick="showPublicIncidents()">Suspicious Activity${noticedCount?` (${noticedCount})`:""}</button><button onclick="watchTheCrowd()">Watch the Crowd</button><button onclick="showRumors()">Rumors</button></div></div>`;
+  if(g==="services")return `<div class="town-action-panel"><h3>Town Services</h3><div class="actions"><button onclick="showShop()">Market</button><button onclick="showStable()">Stable & Caravan Yard</button><button onclick="showInn()">Inn</button><button onclick="showDowntime()">Downtime</button><button onclick="showForge()">Forge</button><button onclick="showCrafting()">Crafting & Commissions</button>${state.town.enchanter?.available?`<button class="good" onclick="showEnchanter()">Rare Enchanter</button>`:""}${state.town.huckster&&!state.town.huckster.resolved?`<button onclick="showHuckster()">Roadside Miracle Seller</button>`:""}${(state.flags.criminalLeverage||0)>0?`<button onclick="callInUnderworldFavor()">Underworld Favor (${state.flags.criminalLeverage})</button>`:""}</div></div>`;
+  return `<div class="town-action-panel"><h3>Party & Character</h3><div class="actions"><button onclick="showPartyManagement()">Party</button><button onclick="showCompanionLoyaltyTab()">Companion Loyalty</button><button onclick="showFieldMagic()">Magic</button><button onclick="showEquipment()">Equipment</button><button onclick="useInventory()">Inventory</button><button onclick="showSkills()">Practical Skills</button><button onclick="showMagicItemTable()">Magic Item Rules</button><button onclick="classOpportunity()">Use ${state.hero.class} Talents</button>${isDark()&&!hasActiveLight()&&state.inventory["Torch"]?`<button onclick="lightTorch()">Light a Torch</button>`:""}${hasActiveLight()?`<button onclick="extinguishLight()">Extinguish Light</button>`:""}</div></div>`;
+}
 function renderTown(){
   refreshQuestStatuses();
   const q=state.questOffer,quests=activeQuests();
@@ -4825,30 +4864,9 @@ function renderTown(){
       <div class="small" style="margin-top:8px"><b>Active quests:</b> ${quests.length}/4${quests.length?` · ${quests.map(x=>escapeHtml(cap(x.task))).join(" · ")}`:""}</div>
       <div class="actions"><button onclick="showQuestJournal()">Open Quest Journal</button>${state.quest&&questById(state.quest.id)?`<button onclick="depart()">Pursue Focused Quest</button>`:""}</div>
     </div>
-    <div class="actions">
-      <button onclick="showWorldMap()">World Map</button>
-      ${atlasDef(state.town.regionId)?`<button onclick="showRegionalAtlas('${state.town.regionId}')">Regional Atlas</button>`:""}
-      ${state.town.dossierId?`<button onclick="showSettlementDossier('${state.town.dossierId}')">Settlement Dossier</button>`:""}
-      <button onclick="showTravelDestinations()">Travel to Another City</button>
-      <button onclick="showQuestJournal()">Quest Journal (${quests.length}/4)</button>
-      <button onclick="showCompanionLoyaltyTab()">Companion Loyalty</button>
-      <button onclick="showFieldMagic()">Field Magic</button>
-      <button onclick="showTownNPCs()">People</button>
-      <button class="${noticedCount?"good":""}" onclick="showPublicIncidents()">Suspicious Activity${noticedCount?` (${noticedCount})`:""}</button>
-      <button onclick="watchTheCrowd()">Watch the Crowd</button>
-      <button onclick="showShop()">Market</button><button onclick="showStable()">Stable & Caravan Yard</button>
-      <button onclick="showInn()">Inn</button><button onclick="showRumors()">Rumors</button>
-      <button onclick="showDowntime()">Downtime</button>
-      <button onclick="showEquipment()">Equipment</button>
-      <button onclick="showForge()">Forge</button><button onclick="showCrafting()">Crafting & Commissions</button>
-      <button onclick="showSkills()">Practical Skills</button>
-      <button onclick="showMagicItemTable()">Magic Item Rules</button>
-      ${state.town.enchanter?.available?`<button class="good" onclick="showEnchanter()">Rare Enchanter</button>`:""}
-      ${state.town.huckster&&!state.town.huckster.resolved?`<button onclick="showHuckster()">Roadside Miracle Seller</button>`:""}
-      ${(state.flags.criminalLeverage||0)>0?`<button onclick="callInUnderworldFavor()">Call In Underworld Favor (${state.flags.criminalLeverage})</button>`:""}
-      <button onclick="classOpportunity()">Use ${state.hero.class} Talents</button>
-      <button onclick="useInventory()">Inventory</button>${isDark()&&!hasActiveLight()&&state.inventory["Torch"]?`<button onclick="lightTorch()">Light a Torch</button>`:""}${hasActiveLight()?`<button onclick="extinguishLight()">Extinguish Light</button>`:""}
-    </div>
+    ${(()=>{const n=townRecommendedAction();return `<div class="card next-action"><h3>Suggested Next Step</h3><p>${escapeHtml(n.detail)}</p><div class="actions"><button class="good" onclick="${n.action}">${escapeHtml(n.label)}</button></div></div>`})()}
+    ${townActionTabs()}
+    ${renderTownActionPanel(noticedCount,quests)}
     <h3>Recent Consequences</h3>
     <p class="small">${consequenceText()}</p>`;
 }
@@ -6684,7 +6702,7 @@ function retreatPosition(){
   state.encounter.distance=2;log("You pull the party back to Far range.");advancePartyActor();
 }
 
-// v0.66.0: Out-of-combat party spellcasting.
+// v0.67.0: Out-of-combat party spellcasting.
 function normalizeAfflictions(actor){actor.afflictions=Array.isArray(actor.afflictions)?actor.afflictions:[];return actor.afflictions}
 function fieldPartyTargets(){const out=[{id:"hero",name:state.hero.name,actor:state.hero,className:state.hero.class}];state.companions.filter(c=>c.hp>0).forEach(c=>out.push({id:c.id,name:c.name,actor:c,className:c.className}));out.forEach(t=>normalizeAfflictions(t.actor));return out}
 function fieldCasterList(){const out=[];if(CLASSES[state.hero.class]?.caster)out.push({id:"hero",name:state.hero.name,actor:state.hero,className:state.hero.class});state.companions.filter(c=>c.hp>0&&CLASSES[c.className]?.caster).forEach(c=>out.push({id:c.id,name:c.name,actor:c,className:c.className}));return out}
@@ -6692,6 +6710,7 @@ function fieldSpellById(className,id){return (SPELLS[className]||[]).find(s=>s.i
 function fieldKnown(actor,id){return (actor.knownSpells||[]).includes(id)}
 function fieldCastableSpells(caster){return (SPELLS[caster.className]||[]).filter(s=>["heal","cleanse"].includes(s.kind)&&fieldKnown(caster.actor,s.id)&&caster.actor.level>=s.level)}
 function showFieldMagic(){
+  state.flags=state.flags||{};state.flags.uiTab="magic";renderCampaignNav();
   if(state.phase==="combat"){log("Field magic cannot be organized while combat is active.","danger");return}
   const casters=fieldCasterList();document.getElementById("sceneContent").innerHTML=`<h2>Field Magic</h2><div class="card small">Healing and cleansing spells may be cast outside combat. Each field casting consumes normal spell points/reagents and 10 minutes of campaign time. Casting does not itself create fame.</div>${casters.map(c=>`<div class="card"><h3>${escapeHtml(c.name)} · ${escapeHtml(c.className)} <span class="badge">SP ${c.actor.spellPoints}/${c.actor.maxSpellPoints}</span></h3>${fieldCastableSpells(c).map(sp=>`<button ${c.actor.spellPoints<sp.cost||sp.reagent&&!state.inventory[sp.reagent]?"disabled":""} onclick="showFieldSpellTargets('${c.id}','${sp.id}')">${escapeHtml(sp.name)} · ${sp.cost} SP</button>`).join(" ")||"<div class='small'>No known field-castable spells.</div>"}</div>`).join("")||"<p class='small'>No active party member can cast field magic.</p>"}<div class="actions"><button onclick="showPartyManagement()">Party</button><button onclick="render()">Adventure</button></div>`;
 }
@@ -7108,7 +7127,7 @@ function autosavePayload(){
   if(!state?.hero)return null;
   return {
     format:"roadwarden-autosave",
-    version:"0.66.0",
+    version:"0.67.0",
     savedAt:new Date().toISOString(),
     reason:state.flags?.lastAutosaveReason||"checkpoint",
     summary:{
@@ -7164,7 +7183,7 @@ function saveDateText(value){
 function campaignSavePayload(){
   return {
     format:"roadwarden-campaign",
-    version:"0.66.0",
+    version:"0.67.0",
     savedAt:new Date().toISOString(),
     summary:{
       hero:state.hero?.name||"Uncreated hero",
@@ -7180,7 +7199,7 @@ function characterSavePayload(){
   if(!state.hero)return null;
   return {
     format:"roadwarden-character",
-    version:"0.66.0",
+    version:"0.67.0",
     savedAt:new Date().toISOString(),
     summary:{
       hero:state.hero.name,
